@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Error as MongooseError } from 'mongoose';
-import BadRequestError from '../errors/BadRequestError';
-import ConflictError from '../errors/ConflictError';
+import BadRequestError from '../errors/bad-request-error';
+import ConflictError from '../errors/conflict-error';
 import Product from '../models/product';
 
 export const getProducts = async (

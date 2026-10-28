@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import Product from '../models/product';
 import { IOrder } from '../models/order';
-import BadRequestError from '../errors/BadRequestError';
+import BadRequestError from '../errors/bad-request-error';
 
 const createOrder = async (
   req: Request<unknown, unknown, IOrder, unknown>,

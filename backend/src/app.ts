@@ -2,14 +2,14 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import path from 'path';
+import { PORT, MONGO_URL } from './config';
 import { errorLogger, requestLogger, serverLogger } from './middlewares/logger';
 import productRoutes from './routes/product';
 import orderRoutes from './routes/order';
-import errorHandler from './middlewares/errorHandler';
-import NotFoundError from './errors/NotFoundError';
+import errorHandler from './middlewares/error-handler';
+import NotFoundError from './errors/not-found-error';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
@@ -30,7 +30,7 @@ app.use(errorLogger);
 app.use(errorHandler);
 
 async function connectToDatabase() {
-  await mongoose.connect('mongodb://127.0.0.1:27017/weblarek');
+  await mongoose.connect(MONGO_URL);
 
   app.listen(PORT, () => {
     serverLogger.info(`Server is running on port ${PORT}`);

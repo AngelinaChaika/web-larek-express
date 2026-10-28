@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { isCelebrateError, Segments } from 'celebrate';
-import BadRequestError from '../errors/BadRequestError';
-import NotFoundError from '../errors/NotFoundError';
-import ConflictError from '../errors/ConflictError';
+import BadRequestError from '../errors/bad-request-error';
+import NotFoundError from '../errors/not-found-error';
+import ConflictError from '../errors/conflict-error';
 
 function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
   if (
