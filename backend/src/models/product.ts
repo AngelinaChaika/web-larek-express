@@ -15,8 +15,8 @@ interface IProduct {
 
 const imageSchema = new mongoose.Schema<IProductImage>(
   {
-    fileName: { type: String, required: true },
-    originalName: { type: String, required: true },
+    fileName: { type: String, required: [true, 'Поле "fileName" является обязательным'] },
+    originalName: { type: String, required: [true, 'Поле "originalName" является обязательным'] },
   },
   { _id: false },
 );
@@ -24,16 +24,16 @@ const imageSchema = new mongoose.Schema<IProductImage>(
 const productSchema = new mongoose.Schema<IProduct>({
   title: {
     type: String,
-    minlength: 2,
-    maxlength: 30,
-    required: true,
+    minlength: [2, 'Минимальная длина поля "title" - 2'],
+    maxlength: [30, 'Максимальная длина поля "title" - 30'],
+    required: [true, 'Поле "title" является обязательным'],
     unique: true,
   },
   image: {
     type: imageSchema,
-    required: true,
+    required: [true, 'Поле "image" является обязательным'],
   },
-  category: { type: String, required: true },
+  category: { type: String, required: [true, 'Поле "category" является обязательным'] },
   description: { type: String },
   price: { type: Number, default: null },
 });

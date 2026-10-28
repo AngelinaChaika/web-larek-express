@@ -37,7 +37,7 @@ export const createProduct = async (
     res.status(201).json(newProduct);
   } catch (error) {
     if (error instanceof MongooseError.ValidationError) {
-      const validationError = new BadRequestError('Validation failed');
+      const validationError = new BadRequestError(error.message);
       next(validationError);
     } else if (error instanceof Error && error.message.includes('E11000')) {
       const conflictError = new ConflictError('Product with this title already exists');
