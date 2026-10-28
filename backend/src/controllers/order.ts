@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import Product from '../models/product';
 import { IOrder } from '../models/order';
+import BadRequestError from '../errors/BadRequestError';
 
 const createOrder = async (
   req: Request<unknown, unknown, IOrder, unknown>,
@@ -10,58 +11,48 @@ const createOrder = async (
   next: NextFunction,
 ) => {
   try {
-    const { payment, email, phone, address, total, items } = req.body;
+    const {
+      payment, email, phone, address, total, items,
+    } = req.body;
 
     if (!Array.isArray(items) || items.length <= 0) {
-      res.status(400).send({ message: 'Invalid order data' });
-      return;
+      throw new BadRequestError('Items must be a non-empty array of product IDs');
     }
     if (!['card', 'online'].includes(payment)) {
-      res.status(400).send({ message: 'Invalid payment method' });
-      return;
+      throw new BadRequestError('Invalid payment method');
     }
     if (!Number.isFinite(total) || total <= 0) {
-      res.status(400).send({ message: 'Invalid total amount' });
-      return;
+      throw new BadRequestError('Invalid total amount');
     }
     if (
-      typeof phone !== 'string' ||
-      phone.trim() === '' ||
-      typeof address !== 'string' ||
-      address.trim() === ''
+      typeof phone !== 'string'
+      || phone.trim() === ''
+      || typeof address !== 'string'
+      || address.trim() === ''
     ) {
-      res.status(400).send({ message: 'Invalid contact information' });
-      return;
+      throw new BadRequestError('Invalid contact information');
     }
     if (
-      typeof email !== 'string' ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+      typeof email !== 'string'
+      || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
     ) {
-      res.status(400).send({ message: 'Invalid email address' });
-      return;
+      throw new BadRequestError('Invalid email address');
     }
     if (
       !items.every((i) => typeof i === 'string' && mongoose.isValidObjectId(i))
     ) {
-      res.status(400).send({ message: 'Invalid product IDs in items' });
-      return;
+      throw new BadRequestError('Invalid product IDs in items');
     }
 
     const orderedProducts = await Product.find({ _id: { $in: items } });
     const uniqueOrderedProductIds = new Set(items);
 
     if (orderedProducts.length !== uniqueOrderedProductIds.size) {
-      res
-        .status(400)
-        .send({ message: 'Some products in the order do not exist' });
-      return;
+      throw new BadRequestError('Some products in the order do not exist');
     }
 
     if (!orderedProducts.every((product) => Number.isFinite(product.price))) {
-      res.status(400).send({
-        message: 'Some products in the order do not have a valid price',
-      });
-      return;
+      throw new BadRequestError('Some products in the order do not have a valid price');
     }
 
     const prices = items.map(
@@ -71,10 +62,7 @@ const createOrder = async (
     const calculatedTotal = prices.reduce((sum, price) => sum + price, 0);
 
     if (calculatedTotal !== total) {
-      res.status(400).send({
-        message: 'Total amount does not match the sum of product prices',
-      });
-      return;
+      throw new BadRequestError('Total amount does not match the sum of product prices');
     }
 
     const randomUuid = faker.string.uuid();
