@@ -2,10 +2,12 @@ import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import path from 'path';
-import { PORT, MONGO_URL } from './config';
+import cookieParser from 'cookie-parser';
+import { PORT, MONGO_URL, ORIGIN_ALLOW } from './config';
 import { errorLogger, requestLogger, serverLogger } from './middlewares/logger';
 import productRoutes from './routes/product';
 import orderRoutes from './routes/order';
+import authRouter from './routes/auth';
 import errorHandler from './middlewares/error-handler';
 import NotFoundError from './errors/not-found-error';
 
@@ -13,12 +15,17 @@ const app = express();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
-app.use(cors());
+app.use(cors({
+  origin: ORIGIN_ALLOW,
+  credentials: true,
+}));
+app.use(cookieParser());
 
 app.use(requestLogger);
 
 app.use('/product', productRoutes);
 app.use('/order', orderRoutes);
+app.use('/auth', authRouter);
 
 app.use((_req: Request, _res: Response, next: NextFunction) => {
   const errorInstance = new NotFoundError('Маршрут не найден');

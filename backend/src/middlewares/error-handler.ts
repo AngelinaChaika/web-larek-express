@@ -3,12 +3,14 @@ import { isCelebrateError, Segments } from 'celebrate';
 import BadRequestError from '../errors/bad-request-error';
 import NotFoundError from '../errors/not-found-error';
 import ConflictError from '../errors/conflict-error';
+import UnauthorizedError from '../errors/unauthorized-error';
 
 function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
   if (
     err instanceof BadRequestError
     || err instanceof NotFoundError
     || err instanceof ConflictError
+    || err instanceof UnauthorizedError
   ) {
     res.status(err.statusCode).send({ message: err.message });
     return;
