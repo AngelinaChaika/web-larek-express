@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { isCelebrateError, Segments } from 'celebrate';
+import { MulterError } from 'multer';
 import BadRequestError from '../errors/bad-request-error';
 import NotFoundError from '../errors/not-found-error';
 import ConflictError from '../errors/conflict-error';
@@ -19,6 +20,14 @@ function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunct
     const error = err.details.get(Segments.BODY);
     const message = error ? error.message : 'Validation error';
     res.status(400).send({ message });
+    return;
+  }
+  if (err instanceof MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      res.status(400).send({ message: 'File is too large' });
+      return;
+    }
+    res.status(400).send({ message: err.message });
     return;
   }
   res.status(500).send({ message: 'Internal Server Error' });

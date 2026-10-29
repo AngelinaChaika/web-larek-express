@@ -8,13 +8,16 @@ import { errorLogger, requestLogger, serverLogger } from './middlewares/logger';
 import productRoutes from './routes/product';
 import orderRoutes from './routes/order';
 import authRouter from './routes/auth';
+import uploadRouter from './routes/upload';
 import errorHandler from './middlewares/error-handler';
 import NotFoundError from './errors/not-found-error';
+import './utils/cleanup-temp';
 
 const app = express();
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
+app.use('/images', express.static(path.join(__dirname, '../images')));
 app.use(cors({
   origin: ORIGIN_ALLOW,
   credentials: true,
@@ -26,6 +29,7 @@ app.use(requestLogger);
 app.use('/product', productRoutes);
 app.use('/order', orderRoutes);
 app.use('/auth', authRouter);
+app.use('/upload', uploadRouter);
 
 app.use((_req: Request, _res: Response, next: NextFunction) => {
   const errorInstance = new NotFoundError('Маршрут не найден');

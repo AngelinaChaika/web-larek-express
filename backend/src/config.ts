@@ -22,6 +22,9 @@ const JWT_REFRESH_SECRET = getRequiredEnv('JWT_REFRESH_SECRET');
 
 const { ORIGIN_ALLOW } = process.env;
 
+const UPLOAD_PATH = process.env.UPLOAD_PATH || 'images';
+const UPLOAD_PATH_TEMP = process.env.UPLOAD_PATH_TEMP || 'temp';
+
 export {
   PORT,
   MONGO_URL,
@@ -30,4 +33,6 @@ export {
   JWT_ACCESS_SECRET,
   JWT_REFRESH_SECRET,
   ORIGIN_ALLOW,
+  UPLOAD_PATH,
+  UPLOAD_PATH_TEMP,
 };

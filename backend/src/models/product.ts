@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import { deleteImage } from '../utils/files';
+import { serverLogger } from '../middlewares/logger';
 
 interface IProductImage {
   fileName: string;
@@ -37,5 +39,19 @@ const productSchema = new mongoose.Schema<IProduct>({
   description: { type: String },
   price: { type: Number, default: null },
 });
+
+productSchema.post(
+  'findOneAndDelete',
+  async (doc: mongoose.HydratedDocument<IProduct> | null) => {
+    if (!doc) {
+      return;
+    }
+    try {
+      await deleteImage(doc.image.fileName);
+    } catch (error) {
+      serverLogger.error(error);
+    }
+  },
+);
 
 export default mongoose.model<IProduct>('Product', productSchema);
