@@ -6,16 +6,19 @@ import { JWT_ACCESS_SECRET } from '../config';
 function auth(req: Request, _res: Response, next: NextFunction) {
   const { authorization } = req.headers;
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    return next(new UnauthorizedError('Authorization required'));
+    next(new UnauthorizedError('Authorization required'));
+    return;
   }
 
   const token = authorization.slice(7);
   if (!token.trim()) {
-    return next(new UnauthorizedError('Authorization required'));
+    next(new UnauthorizedError('Authorization required'));
+    return;
   }
 
   try {
-    verifyToken(token, JWT_ACCESS_SECRET);
+    const userId = verifyToken(token, JWT_ACCESS_SECRET);
+    req.user = { _id: userId };
     next();
   } catch (error) {
     next(error);

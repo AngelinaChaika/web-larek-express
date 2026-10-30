@@ -37,7 +37,7 @@ const productSchema = new mongoose.Schema<IProduct>({
   },
   category: { type: String, required: [true, 'Поле "category" является обязательным'] },
   description: { type: String },
-  price: { type: Number, default: null },
+  price: { type: Number, min: 0, default: null },
 });
 
 productSchema.post(

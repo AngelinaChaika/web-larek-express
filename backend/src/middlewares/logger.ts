@@ -32,6 +32,10 @@ const serverLogger = winston.createLogger({
     new winston.transports.File({
       filename: 'logs/server.log',
     }),
+    new winston.transports.File({
+      filename: 'logs/error.log',
+      level: 'error',
+    }),
   ],
 });
 

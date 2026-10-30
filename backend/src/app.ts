@@ -15,6 +15,8 @@ import './utils/cleanup-temp';
 
 const app = express();
 
+app.use(requestLogger);
+
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/images', express.static(path.join(__dirname, '../images')));
@@ -23,8 +25,6 @@ app.use(cors({
   credentials: true,
 }));
 app.use(cookieParser());
-
-app.use(requestLogger);
 
 app.use('/product', productRoutes);
 app.use('/order', orderRoutes);

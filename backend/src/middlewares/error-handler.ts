@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { isCelebrateError, Segments } from 'celebrate';
+import { isCelebrateError } from 'celebrate';
 import { MulterError } from 'multer';
 import BadRequestError from '../errors/bad-request-error';
 import NotFoundError from '../errors/not-found-error';
@@ -17,8 +17,8 @@ function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunct
     return;
   }
   if (isCelebrateError(err)) {
-    const error = err.details.get(Segments.BODY);
-    const message = error ? error.message : 'Validation error';
+    const validationError = [...err.details.values()][0];
+    const message = validationError?.message || 'Validation error';
     res.status(400).send({ message });
     return;
   }
