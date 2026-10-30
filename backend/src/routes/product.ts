@@ -7,10 +7,14 @@ import {
   deleteProduct,
 } from '../controllers/product';
 import { productSchema, updateProductValidationSchema, productIdValidationSchema } from '../validators/product';
+import auth from '../middlewares/auth';
 
 const router = Router();
 
 router.get('/', getProducts);
+
+router.use(auth);
+
 router.post('/', celebrate({ [Segments.BODY]: productSchema }), createProduct);
 router.patch(
   '/:productId',
