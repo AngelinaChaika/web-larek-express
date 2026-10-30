@@ -32,10 +32,7 @@
     "cors": "^2.8.6",
     "express": "^4.19.2",
     "express-winston": "^4.2.0",
-    "joi": "^18.3.1",
-    "mongodb": "^7.7.0",
     "mongoose": "^8.24.7",
-    "validator": "^13.11.0",
     "winston": "^3.19.0"
   }
 }
