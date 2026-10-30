@@ -18,7 +18,7 @@ const app = express();
 app.use(requestLogger);
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.resolve(process.cwd(), 'src/public')));
 app.use('/images', express.static(path.join(__dirname, '../images')));
 app.use(cors({
   origin: ORIGIN_ALLOW,
