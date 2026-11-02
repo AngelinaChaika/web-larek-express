@@ -1,9 +1,9 @@
-class ConflictError extends Error {
-  statusCode: number;
+import HttpStatus from '../constants/http-status';
+import HttpError from './http-error';
 
+class ConflictError extends HttpError {
   constructor(message: string) {
-    super(message);
-    this.statusCode = 409;
+    super(message, HttpStatus.CONFLICT);
   }
 }
 

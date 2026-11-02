@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Error as MongooseError } from 'mongoose';
+import HttpStatus from '../constants/http-status';
+import isDuplicateKeyError from '../utils/mongo-errors';
 import BadRequestError from '../errors/bad-request-error';
 import ConflictError from '../errors/conflict-error';
 import Product from '../models/product';
@@ -14,7 +16,7 @@ const getProducts = async (
 ) => {
   try {
     const products = await Product.find();
-    res.status(200).send({ items: products, total: products.length });
+    res.status(HttpStatus.OK).send({ items: products, total: products.length });
   } catch (error) {
     next(error);
   }
@@ -40,7 +42,7 @@ const createProduct = async (
     await moveImage(image.fileName);
     imageMoved = true;
     await newProduct.save();
-    res.status(201).json(newProduct);
+    res.status(HttpStatus.CREATED).json(newProduct);
   } catch (error) {
     if (imageMoved) {
       try {
@@ -52,7 +54,7 @@ const createProduct = async (
     if (error instanceof MongooseError.ValidationError) {
       const validationError = new BadRequestError(error.message);
       next(validationError);
-    } else if (error instanceof Error && error.message.includes('E11000')) {
+    } else if (isDuplicateKeyError(error)) {
       const conflictError = new ConflictError('Product with this title already exists');
       next(conflictError);
     } else {
@@ -109,7 +111,7 @@ const updateProduct = async (
       }
     }
 
-    res.status(200).send(product);
+    res.status(HttpStatus.OK).send(product);
   } catch (error) {
     if (imageMoved) {
       try {
@@ -121,12 +123,9 @@ const updateProduct = async (
     if (error instanceof MongooseError.ValidationError) {
       const validationError = new BadRequestError(error.message);
       next(validationError);
-    } else if (error instanceof Error && error.message.includes('E11000')) {
+    } else if (isDuplicateKeyError(error)) {
       const conflictError = new ConflictError('Product with this title already exists');
       next(conflictError);
-    } else if (error instanceof MongooseError.CastError) {
-      const castError = new BadRequestError(error.message);
-      next(castError);
     } else {
       next(error);
     }
@@ -144,14 +143,9 @@ const deleteProduct = async (
     if (deletedProduct === null) {
       throw new NotFoundError('Product not found');
     }
-    res.status(200).send(deletedProduct);
+    res.status(HttpStatus.OK).send(deletedProduct);
   } catch (error) {
-    if (error instanceof MongooseError.CastError) {
-      const castError = new BadRequestError(error.message);
-      next(castError);
-    } else {
-      next(error);
-    }
+    next(error);
   }
 };
 

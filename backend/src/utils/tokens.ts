@@ -1,5 +1,6 @@
 import jsonwebtoken, { JsonWebTokenError } from 'jsonwebtoken';
 import mongoose from 'mongoose';
+import HttpStatus from '../constants/http-status';
 import UnauthorizedError from '../errors/unauthorized-error';
 import BadRequestError from '../errors/bad-request-error';
 import {
@@ -25,7 +26,7 @@ function generateTokens(userId: string) {
   return { accessToken, refreshToken };
 }
 
-function verifyToken(token: string, secret: string, invalidIdStatus = 401) {
+function verifyToken(token: string, secret: string, invalidIdStatus = HttpStatus.UNAUTHORIZED) {
   try {
     const decoded = jsonwebtoken.verify(token, secret);
 
@@ -34,7 +35,7 @@ function verifyToken(token: string, secret: string, invalidIdStatus = 401) {
     }
 
     if (!mongoose.isValidObjectId(decoded._id)) {
-      if (invalidIdStatus === 400) {
+      if (invalidIdStatus === HttpStatus.BAD_REQUEST) {
         throw new BadRequestError('Invalid user ID');
       }
       throw new UnauthorizedError('Invalid token');

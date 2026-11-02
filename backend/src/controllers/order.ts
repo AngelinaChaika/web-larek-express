@@ -1,6 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { Request, Response, NextFunction } from 'express';
-import mongoose from 'mongoose';
+import HttpStatus from '../constants/http-status';
 import Product from '../models/product';
 import { IOrder } from '../models/order';
 import BadRequestError from '../errors/bad-request-error';
@@ -11,38 +11,7 @@ const createOrder = async (
   next: NextFunction,
 ) => {
   try {
-    const {
-      payment, email, phone, address, total, items,
-    } = req.body;
-
-    if (!Array.isArray(items) || items.length <= 0) {
-      throw new BadRequestError('Items must be a non-empty array of product IDs');
-    }
-    if (!['card', 'online'].includes(payment)) {
-      throw new BadRequestError('Invalid payment method');
-    }
-    if (!Number.isFinite(total) || total <= 0) {
-      throw new BadRequestError('Invalid total amount');
-    }
-    if (
-      typeof phone !== 'string'
-      || phone.trim() === ''
-      || typeof address !== 'string'
-      || address.trim() === ''
-    ) {
-      throw new BadRequestError('Invalid contact information');
-    }
-    if (
-      typeof email !== 'string'
-      || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    ) {
-      throw new BadRequestError('Invalid email address');
-    }
-    if (
-      !items.every((i) => typeof i === 'string' && mongoose.isValidObjectId(i))
-    ) {
-      throw new BadRequestError('Invalid product IDs in items');
-    }
+    const { total, items } = req.body;
 
     const orderedProducts = await Product.find({ _id: { $in: items } });
     const uniqueOrderedProductIds = new Set(items);
@@ -66,7 +35,7 @@ const createOrder = async (
     }
 
     const randomUuid = faker.string.uuid();
-    res.status(200).send({ id: randomUuid, total });
+    res.status(HttpStatus.OK).send({ id: randomUuid, total });
   } catch (error) {
     next(error);
   }

@@ -4,8 +4,7 @@ import { UPLOAD_PATH, UPLOAD_PATH_TEMP } from '../config';
 import BadRequestError from '../errors/bad-request-error';
 
 type FileSystemError = Error & { code?: string };
-const fileNamePattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(png|jpg|jpeg|webp|gif|svg)$/;
-
+const fileNamePattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(png|jpg|jpeg|webp|gif|svg)$/;
 async function moveImage(fileName: string) {
   const baseName = path.basename(fileName);
 

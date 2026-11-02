@@ -1,9 +1,9 @@
-class UnauthorizedError extends Error {
-  statusCode: number;
+import HttpStatus from '../constants/http-status';
+import HttpError from './http-error';
 
+class UnauthorizedError extends HttpError {
   constructor(message: string) {
-    super(message);
-    this.statusCode = 401;
+    super(message, HttpStatus.UNAUTHORIZED);
   }
 }
 

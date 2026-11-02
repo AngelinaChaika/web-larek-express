@@ -1,36 +1,29 @@
 import { Request, Response, NextFunction } from 'express';
 import { isCelebrateError } from 'celebrate';
 import { MulterError } from 'multer';
-import BadRequestError from '../errors/bad-request-error';
-import NotFoundError from '../errors/not-found-error';
-import ConflictError from '../errors/conflict-error';
-import UnauthorizedError from '../errors/unauthorized-error';
+import HttpStatus from '../constants/http-status';
+import HttpError from '../errors/http-error';
 
 function errorHandler(err: Error, _req: Request, res: Response, _next: NextFunction) {
-  if (
-    err instanceof BadRequestError
-    || err instanceof NotFoundError
-    || err instanceof ConflictError
-    || err instanceof UnauthorizedError
-  ) {
+  if (err instanceof HttpError) {
     res.status(err.statusCode).send({ message: err.message });
     return;
   }
   if (isCelebrateError(err)) {
     const validationError = [...err.details.values()][0];
     const message = validationError?.message || 'Validation error';
-    res.status(400).send({ message });
+    res.status(HttpStatus.BAD_REQUEST).send({ message });
     return;
   }
   if (err instanceof MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      res.status(400).send({ message: 'File is too large' });
+      res.status(HttpStatus.BAD_REQUEST).send({ message: 'File is too large' });
       return;
     }
-    res.status(400).send({ message: err.message });
+    res.status(HttpStatus.BAD_REQUEST).send({ message: err.message });
     return;
   }
-  res.status(500).send({ message: 'Internal Server Error' });
+  res.status(HttpStatus.INTERNAL_SERVER_ERROR).send({ message: 'Internal Server Error' });
 }
 
 export default errorHandler;

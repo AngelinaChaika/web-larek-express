@@ -1,9 +1,9 @@
-class BadRequestError extends Error {
-  statusCode: number;
+import HttpStatus from '../constants/http-status';
+import HttpError from './http-error';
 
+class BadRequestError extends HttpError {
   constructor(message: string) {
-    super(message);
-    this.statusCode = 400;
+    super(message, HttpStatus.BAD_REQUEST);
   }
 }
 
